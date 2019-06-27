@@ -1,14 +1,13 @@
-// swift-tools-version:4.1
-// The swift-tools-version declares the minimum version of Swift required to build this package.
+// swift-tools-version:5.0
 
 import PackageDescription
 
 let package = Package(
     name: "Hammond",
     products: [
-        .library(name: "Hammond", type: .static, targets: ["Hammond"]),
+        .library(name: "Hammond", targets: ["Hammond"]),
     ],
     targets: [
-        .target(name: "Hammond", dependencies: [])
+        .target(name: "Hammond")
     ]
 )
