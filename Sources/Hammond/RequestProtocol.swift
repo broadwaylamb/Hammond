@@ -5,43 +5,37 @@
 //  Created by Sergej Jaskiewicz on 12/04/2018.
 //
 
-import Foundation
-
 public protocol RequestProtocol {
-
     var path: String { get }
-
-    static var successStatusCode: HTTPStatusCode { get }
-}
-
-extension RequestProtocol {
-    public static var successStatusCode: HTTPStatusCode { return 200 }
+    static var method: HTTPMethod { get }
 }
 
 public protocol DecodableRequestProtocol: RequestProtocol {
 
     associatedtype Result
     associatedtype ServerError: ServerErrorProtocol
+    associatedtype ResponseBody
 
-    static func deserializeResult<T: Decodable>(from data: Data) throws -> T
+    static func deserializeError(from body: ResponseBody) throws -> ServerError
 
-    static func decodeError<Response: ResponseProtocol>(
+    static func deserializeResult(from body: ResponseBody) throws -> Result
+
+    static func extractError<Response: ResponseProtocol>(
         from response: Response
-    ) throws -> ServerError
+    ) throws -> ServerError where Response.Body == ResponseBody
 
-    static func decodeResult<Response: ResponseProtocol>(
+    static func extractResult<Response: ResponseProtocol>(
         from response: Response
-    ) throws -> Result
+    ) throws -> Result where Response.Body == ResponseBody
 }
 
 extension DecodableRequestProtocol {
 
-    public static func decodeError<Response: ResponseProtocol>(
+    public static func extractError<Response: ResponseProtocol>(
         from response: Response
-    ) throws -> ServerError {
-
+    ) throws -> ServerError where Response.Body == ResponseBody {
         do {
-            return try deserializeResult(from: response.data)
+            return try deserializeError(from: response.body)
         } catch {
             let status = response.statusCode
             if status.category != .success {
@@ -55,40 +49,35 @@ extension DecodableRequestProtocol {
 
 extension DecodableRequestProtocol where Result: Decodable {
 
-    public static func decodeResult<Response: ResponseProtocol>(
+    public static func extractResult<Response: ResponseProtocol>(
         from response: Response
-    ) throws -> Result {
-
-        if response.statusCode == successStatusCode {
-            return try deserializeResult(from: response.data)
+    ) throws -> Result where Response.Body == ResponseBody {
+        if response.statusCode.category == .success {
+            return try deserializeResult(from: response.body)
         } else {
-            throw try decodeError(from: response)
+            throw try extractError(from: response)
         }
     }
 }
 
 extension DecodableRequestProtocol where Result == Void {
-
     public static func decodeResult<Response: ResponseProtocol>(
         from response: Response
-    ) throws -> Void {
-
-        if response.statusCode == successStatusCode { return }
-
-        throw try decodeError(from: response)
+    ) throws -> Void where Response.Body == ResponseBody {
+        if response.statusCode.category == .success { return }
+        throw try extractError(from: response)
     }
 }
 
-extension DecodableRequestProtocol where Result == Data {
+extension DecodableRequestProtocol where Result == ResponseBody {
 
     public static func decodeResult<Response: ResponseProtocol>(
         from response: Response
-    ) throws -> Data {
-
-        if response.statusCode == successStatusCode {
-            return response.data
+    ) throws -> ResponseBody where Response.Body == ResponseBody  {
+        if response.statusCode.category == .success {
+            return response.body
         } else {
-            throw try decodeError(from: response)
+            throw try extractError(from: response)
         }
     }
 }
