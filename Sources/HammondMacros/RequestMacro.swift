@@ -119,9 +119,33 @@ public struct RequestMacro: ExtensionMacro {
             throw .pathMustBeLiteral
         }
 
+        var newSegments: [StringLiteralSegmentListSyntax.Element] = []
+        for segment in pathExpr.segments {
+            switch segment {
+            case .stringSegment(let stringSegment):
+                if case .stringSegment(let string) = stringSegment.content.tokenKind {
+                    try string.parseParameterNames(
+                        into: &newSegments,
+                        stringSegment,
+                        context: context,
+                    )
+                } else {
+                    preconditionFailure("Expected stringSegment token kind")
+                }
+            default:
+                newSegments.append(segment)
+            }
+        }
+
+        let newStringLiteral = StringLiteralExprSyntax(
+            openingQuote: .stringQuoteToken(),
+            segments: StringLiteralSegmentListSyntax(newSegments),
+            closingQuote: .stringQuoteToken(),
+        )
+
         return """
         var path: Swift.String {
-            return \(pathExpr)
+            return \(newStringLiteral)
         }
         """
     }
@@ -135,10 +159,108 @@ public struct RequestMacro: ExtensionMacro {
     }
 }
 
-private enum RequestMacroDiagnostic: String, DiagnosticMessage, Error {
+private extension String {
+    func parseParameterNames(
+        into segments: inout [StringLiteralSegmentListSyntax.Element],
+        _ node: StringSegmentSyntax,
+        context: some MacroExpansionContext,
+    ) throws(RequestMacroDiagnostic) {
+        var parsingParameter = false
+        var currentStringSegment: [Character] = []
+        var paremeterNameStart = -1
+        var currentParameterName: [Character] = []
+        var offset = node.positionAfterSkippingLeadingTrivia.utf8Offset
+
+        func diagnose(
+            _ message: RequestMacroDiagnostic,
+            offset: Int,
+        ) throws(RequestMacroDiagnostic) -> Never {
+            context.diagnose(
+                Diagnostic(
+                    node: node,
+                    position: AbsolutePosition(utf8Offset: offset),
+                    message: message,
+                )
+            )
+            throw message
+        }
+
+        func appendStringSegment() {
+            segments.append(
+                .stringSegment(
+                    StringSegmentSyntax(
+                        content: .stringSegment(String(currentStringSegment))
+                    )
+                )
+            )
+        }
+
+        for c in self {
+            offset += c.utf8.count
+            if c == "{" {
+                if !parsingParameter {
+                    appendStringSegment()
+                    currentStringSegment = []
+                    // Start parsing the parameter name until we meet '}'
+                    parsingParameter = true
+                    paremeterNameStart = offset
+                } else {
+                    try diagnose(.unexpectedCharacterInPath("{"), offset: offset)
+                }
+            } else if c == "}" {
+                if parsingParameter {
+                    segments.append(
+                        .expressionSegment(
+                            ExpressionSegmentSyntax {
+                                LabeledExprSyntax(
+                                    expression: DeclReferenceExprSyntax(
+                                        baseName: .identifier(
+                                            String(currentParameterName)
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                    currentParameterName.removeAll()
+                    parsingParameter = false
+                } else {
+                    try diagnose(.unexpectedCharacterInPath("}"), offset: offset)
+                }
+            } else if c == "/" {
+                if parsingParameter {
+                    try diagnose(
+                        .unterminatedParameterName(String(currentParameterName)),
+                        offset: paremeterNameStart,
+                    )
+                } else {
+                    currentStringSegment.append(c)
+                }
+            } else {
+                if parsingParameter {
+                    currentParameterName.append(c)
+                } else {
+                    currentStringSegment.append(c)
+                }
+            }
+        }
+        if parsingParameter {
+            try diagnose(
+                .unterminatedParameterName(String(currentParameterName)),
+                offset: paremeterNameStart,
+            )
+        } else if !currentStringSegment.isEmpty {
+            appendStringSegment()
+        }
+    }
+}
+
+private enum RequestMacroDiagnostic: DiagnosticMessage, Error {
     case pathMustBeLiteral
     case cannotBeAppliedToExtension
     case cannotBeAppliedToProtocol
+    case unexpectedCharacterInPath(String)
+    case unterminatedParameterName(String)
 
     var message: String {
         switch self {
@@ -148,11 +270,27 @@ private enum RequestMacroDiagnostic: String, DiagnosticMessage, Error {
             "This macro cannot be applied to an extension"
         case .cannotBeAppliedToProtocol:
             "This macro cannot be applied to a protocol"
+        case .unexpectedCharacterInPath(let char):
+            "Unexpected '\(char)' in request path template"
+        case .unterminatedParameterName(let name):
+            "Unterminated parameter name '\(name)'"
         }
     }
 
     var diagnosticID: MessageID {
-        MessageID(domain: "com.broadwaylamb.Hammond.\(Self.self)", id: "\(rawValue)")
+        let id = switch self {
+        case .pathMustBeLiteral:
+            "pathMustBeLiteral"
+        case .cannotBeAppliedToExtension:
+            "cannotBeAppliedToExtension"
+        case .cannotBeAppliedToProtocol:
+            "cannotBeAppliedToExtension"
+        case .unexpectedCharacterInPath:
+            "unexpectedCharacterInPath"
+        case .unterminatedParameterName:
+            "unterminatedParameterName"
+        }
+        return MessageID(domain: "com.broadwaylamb.Hammond.\(Self.self)", id: id)
     }
 
     var severity: DiagnosticSeverity {

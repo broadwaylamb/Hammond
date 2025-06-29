@@ -15,7 +15,7 @@ struct RequestMacroTests {
     @Test func predefinedHTTPMethods() {
         assertMacroExpansion(
             #"""
-            @GET("/myget/\(a)/\(b)")
+            @GET("/myget/{a}/{b}")
             struct MyGetRequest {
                 var a: Int
                 var b: String
@@ -210,6 +210,65 @@ struct RequestMacroTests {
                 }
             }
             """,
+            macroSpecs: testMacros,
+        )
+    }
+
+    @Test func pathTemplateErrors() {
+        assertMacroExpansion(
+            #"""
+            @GET("/myget/{foo")
+            struct MyGetRequest {
+            }
+            
+            @GET("/myget/{bar/}")
+            struct MyGetRequest2 {
+            }
+            
+            @GET("/{{baz}}")
+            struct MyGetRequest3 {
+            }
+            
+            @GET("/hi}")
+            struct MyGetRequest4 {
+            }
+            """#,
+            expandedSource: #"""
+            struct MyGetRequest {
+            }
+            struct MyGetRequest2 {
+            }
+            struct MyGetRequest3 {
+            }
+            struct MyGetRequest4 {
+            }
+            """#,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "Unterminated parameter name 'foo'",
+                    line: 1,
+                    column: 15,
+                    severity: .error,
+                ),
+                DiagnosticSpec(
+                    message: "Unterminated parameter name 'bar'",
+                    line: 5,
+                    column: 15,
+                    severity: .error,
+                ),
+                DiagnosticSpec(
+                    message: "Unexpected '{' in request path template",
+                    line: 9,
+                    column: 10,
+                    severity: .error,
+                ),
+                DiagnosticSpec(
+                    message: "Unexpected '}' in request path template",
+                    line: 13,
+                    column: 11,
+                    severity: .error,
+                ),
+            ],
             macroSpecs: testMacros,
         )
     }
