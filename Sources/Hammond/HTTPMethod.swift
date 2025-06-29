@@ -5,7 +5,7 @@
 //  Created by Sergej Jaskiewicz on 15.07.2019.
 //
 
-public struct HTTPMethod: RawRepresentable, Hashable, Codable {
+public struct HTTPMethod: RawRepresentable, Hashable, Codable, Sendable {
 
     public var rawValue: String
 

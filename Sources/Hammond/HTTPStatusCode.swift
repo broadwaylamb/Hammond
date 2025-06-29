@@ -5,7 +5,7 @@
 //  Created by Sergej Jaskiewicz on 12/04/2018.
 //
 
-public struct HTTPStatusCode: RawRepresentable, Hashable, Codable {
+public struct HTTPStatusCode: RawRepresentable, Hashable, Codable, Sendable {
 
     public var rawValue: Int
 

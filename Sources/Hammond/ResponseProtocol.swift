@@ -5,7 +5,7 @@
 //  Created by Sergej Jaskiewicz on 12/04/2018.
 //
 
-public protocol ResponseProtocol {
+public protocol ResponseProtocol<Body> {
 
     associatedtype Body
 
