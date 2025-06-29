@@ -44,6 +44,33 @@ public struct RequestMacro: ExtensionMacro {
             httpMethodName = ExprSyntax(StringLiteralExprSyntax(content: macroName))
             pathArgumentIndex = 0
         }
+
+        let alreadyHasQueryItemsMember = declaration
+            .memberBlock
+            .members
+            .contains { item in
+                guard let varDecl = item.decl.as(VariableDeclSyntax.self) else {
+                    return false
+                }
+
+                let isStatic = varDecl.modifiers.contains {
+                    $0.name.tokenKind == .keyword(.static) ||
+                        $0.name.tokenKind == .keyword(.class)
+                }
+
+                if isStatic {
+                    return false
+                }
+
+                return varDecl.bindings.contains { binding in
+                    binding.pattern
+                        .as(IdentifierPatternSyntax.self)?
+                        .identifier
+                        .identifier?
+                        .name == "queryItems"
+                }
+            }
+
         do {
             return [
                 try ExtensionDeclSyntax(
@@ -55,7 +82,9 @@ public struct RequestMacro: ExtensionMacro {
                     },
                     memberBlockBuilder: {
                         methodMember(httpMethodName)
-                        queryItemsMember()
+                        if !alreadyHasQueryItemsMember {
+                            queryItemsMember()
+                        }
                         if pathArgumentIndex < args.count {
                             try pathMember(args[pathArgumentIndex], context: context)
                         }

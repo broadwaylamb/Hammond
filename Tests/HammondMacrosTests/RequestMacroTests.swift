@@ -154,6 +154,65 @@ struct RequestMacroTests {
             macroSpecs: testMacros,
         )
     }
+
+    @Test func customQueryItems() {
+        assertMacroExpansion(
+            """
+            @GET("/foobar")
+            struct MyGetRequest {
+                var queryItems: [(key: String, value: String?)]? {
+                    fatalError()
+                }
+            }
+            """,
+            expandedSource: """
+            struct MyGetRequest {
+                var queryItems: [(key: String, value: String?)]? {
+                    fatalError()
+                }
+            }
+            
+            extension MyGetRequest: RequestProtocol {
+                static let method = Hammond.HTTPMethod(rawValue: "GET")
+                var path: Swift.String {
+                    return "/foobar"
+                }
+            }
+            """,
+            macroSpecs: testMacros,
+        )
+    }
+
+    @Test func staticQueryItems() {
+        assertMacroExpansion(
+            """
+            @GET("/foobar")
+            struct MyGetRequest {
+                static var queryItems: [(key: String, value: String?)]? {
+                    fatalError()
+                }
+            }
+            """,
+            expandedSource: """
+            struct MyGetRequest {
+                static var queryItems: [(key: String, value: String?)]? {
+                    fatalError()
+                }
+            }
+            
+            extension MyGetRequest: RequestProtocol {
+                static let method = Hammond.HTTPMethod(rawValue: "GET")
+                var queryItems: [(key: Swift.String, value: Swift.String?)]? {
+                    return nil
+                }
+                var path: Swift.String {
+                    return "/foobar"
+                }
+            }
+            """,
+            macroSpecs: testMacros,
+        )
+    }
 }
 
 private let testMacros: [String : MacroSpec] = Dictionary(
