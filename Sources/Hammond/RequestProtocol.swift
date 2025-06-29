@@ -7,7 +7,14 @@
 
 public protocol RequestProtocol {
     var path: String { get }
+    var queryItems: [(key: String, value: String?)]? { get }
     static var method: HTTPMethod { get }
+}
+
+extension RequestProtocol {
+    var queryItems: [(key: String, value: String?)?]? {
+        nil
+    }
 }
 
 public protocol DecodableRequestProtocol: RequestProtocol {
