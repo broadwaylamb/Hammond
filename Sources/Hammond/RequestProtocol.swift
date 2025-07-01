@@ -65,17 +65,11 @@ extension DecodableRequestProtocol {
 }
 
 extension DecodableRequestProtocol where Result == Void {
-    public static func decodeResult(
-        from response: some ResponseProtocol<ResponseBody>
-    ) throws -> Void {
-        if response.statusCode.category == .success { return }
-        throw try extractError(from: response)
-    }
+    public static func deserializeResult(from body: ResponseBody) throws -> Void {}
 }
 
 extension DecodableRequestProtocol where Result == ResponseBody {
-
-    public static func decodeResult(
+    public static func extractResult(
         from response: some ResponseProtocol<ResponseBody>
     ) throws -> ResponseBody  {
         if response.statusCode.category == .success {
