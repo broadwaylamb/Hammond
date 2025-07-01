@@ -46,13 +46,8 @@ public struct RequestMacro: ExtensionMacro {
         }
 
         let alreadyHasQueryItemsMember = declaration
-            .memberBlock
-            .members
-            .contains { item in
-                guard let varDecl = item.decl.as(VariableDeclSyntax.self) else {
-                    return false
-                }
-
+            .varDecls
+            .contains { varDecl in
                 let isStatic = varDecl.modifiers.contains {
                     $0.name.tokenKind == .keyword(.static) ||
                         $0.name.tokenKind == .keyword(.class)
@@ -298,11 +293,3 @@ private enum RequestMacroDiagnostic: DiagnosticMessage, Error {
     }
 }
 
-private extension AttributeSyntax {
-    func getMacroArguments() -> [ExprSyntax] {
-        guard let exprList = arguments?.as(LabeledExprListSyntax.self) else {
-            return []
-        }
-        return exprList.map { $0.expression }
-    }
-}
