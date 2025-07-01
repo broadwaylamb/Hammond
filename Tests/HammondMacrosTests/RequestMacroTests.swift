@@ -64,6 +64,62 @@ struct RequestMacroTests {
         )
     }
 
+    @Test func escapedUnicodeCharacterInPath() {
+        assertMacroExpansion(
+            #"""
+            @GET("/myget/\u{41}")
+            struct MyGetRequest {
+                var a: Int
+                var b: String
+            }
+            """#,
+            expandedSource: #"""
+            struct MyGetRequest {
+                var a: Int
+                var b: String
+            }
+            
+            extension MyGetRequest: RequestProtocol {
+                static let method = Hammond.HTTPMethod(rawValue: "GET")
+                var queryItems: [(key: Swift.String, value: Swift.String?)]? {
+                    return nil
+                }
+                var path: Swift.String {
+                    return "/myget/\u{41}"
+                }
+            }
+            """#,
+            macroSpecs: testMacros,
+        )
+    }
+
+    @Test func unicodeEscapeSequenceInParameterName() {
+        assertMacroExpansion(
+            #"""
+            @GET("/myget/{param\u{41}}")
+            struct MyGetRequest {
+                var a: Int
+                var b: String
+            }
+            """#,
+            expandedSource: #"""
+            struct MyGetRequest {
+                var a: Int
+                var b: String
+            }
+            """#,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "Unicode escape sequences in parameter names are not allowed",
+                    line: 1,
+                    column: 21,
+                    severity: .error,
+                ),
+            ],
+            macroSpecs: testMacros,
+        )
+    }
+
     @Test func customPathInBody() {
         assertMacroExpansion(
             """

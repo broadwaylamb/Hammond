@@ -161,6 +161,7 @@ private extension String {
         context: some MacroExpansionContext,
     ) throws(RequestMacroDiagnostic) {
         var parsingParameter = false
+        var parsingUnicodeEscapeSequence = false
         var currentStringSegment: [Character] = []
         var paremeterNameStart = -1
         var currentParameterName: [Character] = []
@@ -190,10 +191,19 @@ private extension String {
             )
         }
 
-        for c in self {
+        for slice in lookahead(3) {
+            let c = slice.first!
             offset += c.utf8.count
+            if slice == "\\u{" {
+                if parsingParameter {
+                    try diagnose(.escapeSequenceInParameterName, offset: offset)
+                }
+                parsingUnicodeEscapeSequence = true
+            }
             if c == "{" {
-                if !parsingParameter {
+                if parsingUnicodeEscapeSequence {
+                    currentStringSegment.append(c)
+                } else if !parsingParameter {
                     appendStringSegment()
                     currentStringSegment = []
                     // Start parsing the parameter name until we meet '}'
@@ -203,7 +213,10 @@ private extension String {
                     try diagnose(.unexpectedCharacterInPath("{"), offset: offset)
                 }
             } else if c == "}" {
-                if parsingParameter {
+                if parsingUnicodeEscapeSequence {
+                    currentStringSegment.append(c)
+                    parsingUnicodeEscapeSequence = false
+                } else if parsingParameter {
                     segments.append(
                         .expressionSegment(
                             ExpressionSegmentSyntax {
@@ -256,6 +269,7 @@ private enum RequestMacroDiagnostic: DiagnosticMessage, Error {
     case cannotBeAppliedToProtocol
     case unexpectedCharacterInPath(String)
     case unterminatedParameterName(String)
+    case escapeSequenceInParameterName
 
     var message: String {
         switch self {
@@ -269,6 +283,8 @@ private enum RequestMacroDiagnostic: DiagnosticMessage, Error {
             "Unexpected '\(char)' in request path template"
         case .unterminatedParameterName(let name):
             "Unterminated parameter name '\(name)'"
+        case .escapeSequenceInParameterName:
+            "Unicode escape sequences in parameter names are not allowed"
         }
     }
 
@@ -284,6 +300,8 @@ private enum RequestMacroDiagnostic: DiagnosticMessage, Error {
             "unexpectedCharacterInPath"
         case .unterminatedParameterName:
             "unterminatedParameterName"
+        case .escapeSequenceInParameterName:
+            "escapeSequenceInParameterName"
         }
         return MessageID(domain: "com.broadwaylamb.Hammond.\(Self.self)", id: id)
     }
