@@ -7,12 +7,23 @@
 
 public protocol RequestProtocol {
     var path: String { get }
-    var queryItems: [(key: String, value: String?)]? { get }
     static var method: HTTPMethod { get }
 }
 
-extension RequestProtocol {
-    var queryItems: [(key: String, value: String?)?]? {
+public protocol EncodableRequestProtocol {
+    associatedtype EncodableQuery: Encodable = Never
+    associatedtype EncodableBody: Encodable = Never
+
+    var encodableQuery: EncodableQuery? { get }
+    var encodableBody: EncodableBody? { get }
+}
+
+extension EncodableRequestProtocol {
+    public var encodableQuery: EncodableQuery? {
+        nil
+    }
+
+    public var encodableBody: EncodableBody? {
         nil
     }
 }

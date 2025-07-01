@@ -84,3 +84,24 @@ public macro CONNECT(_ path: String) =
 @attached(extension, conformances: RequestProtocol, names: named(method), named(path), named(queryItems))
 public macro CONNECT() =
     #externalMacro(module: "HammondMacros", type: "RequestMacro")
+
+@attached(
+    extension,
+    conformances: EncodableRequestProtocol,
+    names: named(encodableQuery),
+    named(encodableBody)
+)
+public macro EncodableRequest() =
+    #externalMacro(module: "HammondMacros", type: "EncodableRequestMacro")
+
+@attached(peer)
+public macro Query(key: String) = #externalMacro(
+    module: "HammondMacros",
+    type: "MarkerMacro"
+)
+
+@attached(peer)
+public macro Query() = #externalMacro(
+    module: "HammondMacros",
+    type: "MarkerMacro"
+)

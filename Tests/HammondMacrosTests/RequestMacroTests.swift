@@ -29,9 +29,6 @@ struct RequestMacroTests {
             
             extension MyGetRequest: RequestProtocol {
                 static let method = Hammond.HTTPMethod(rawValue: "GET")
-                var queryItems: [(key: Swift.String, value: Swift.String?)]? {
-                    return nil
-                }
                 var path: Swift.String {
                     return "/myget/\(a)/\(b)"
                 }
@@ -52,9 +49,6 @@ struct RequestMacroTests {
             
             extension MyGetRequest: RequestProtocol {
                 static let method = Hammond.HTTPMethod(rawValue: "whatever123")
-                var queryItems: [(key: Swift.String, value: Swift.String?)]? {
-                    return nil
-                }
                 var path: Swift.String {
                     return "/foobar"
                 }
@@ -81,9 +75,6 @@ struct RequestMacroTests {
             
             extension MyGetRequest: RequestProtocol {
                 static let method = Hammond.HTTPMethod(rawValue: "GET")
-                var queryItems: [(key: Swift.String, value: Swift.String?)]? {
-                    return nil
-                }
                 var path: Swift.String {
                     return "/myget/\u{41}"
                 }
@@ -135,9 +126,6 @@ struct RequestMacroTests {
             
             extension MyGetRequest: RequestProtocol {
                 static let method = Hammond.HTTPMethod(rawValue: "POST")
-                var queryItems: [(key: Swift.String, value: Swift.String?)]? {
-                    return nil
-                }
             }
             """,
             macroSpecs: testMacros,
@@ -211,61 +199,25 @@ struct RequestMacroTests {
         )
     }
 
-    @Test func customQueryItems() {
+    @Test func queryWithoutTypeAnnotation() {
         assertMacroExpansion(
             """
-            @GET("/foobar")
             struct MyGetRequest {
-                var queryItems: [(key: String, value: String?)]? {
-                    fatalError()
-                }
+                @Query var a = 1
             }
             """,
             expandedSource: """
             struct MyGetRequest {
-                var queryItems: [(key: String, value: String?)]? {
-                    fatalError()
-                }
-            }
-            
-            extension MyGetRequest: RequestProtocol {
-                static let method = Hammond.HTTPMethod(rawValue: "GET")
-                var path: Swift.String {
-                    return "/foobar"
-                }
+                var a = 1
             }
             """,
-            macroSpecs: testMacros,
-        )
-    }
-
-    @Test func staticQueryItems() {
-        assertMacroExpansion(
-            """
-            @GET("/foobar")
-            struct MyGetRequest {
-                static var queryItems: [(key: String, value: String?)]? {
-                    fatalError()
-                }
-            }
-            """,
-            expandedSource: """
-            struct MyGetRequest {
-                static var queryItems: [(key: String, value: String?)]? {
-                    fatalError()
-                }
-            }
-            
-            extension MyGetRequest: RequestProtocol {
-                static let method = Hammond.HTTPMethod(rawValue: "GET")
-                var queryItems: [(key: Swift.String, value: Swift.String?)]? {
-                    return nil
-                }
-                var path: Swift.String {
-                    return "/foobar"
-                }
-            }
-            """,
+            diagnostics: [
+                DiagnosticSpec(
+                    message: "Type annotation is mandatory for '@Query' properties",
+                    line: 2,
+                    column: 5,
+                ),
+            ],
             macroSpecs: testMacros,
         )
     }
@@ -328,13 +280,159 @@ struct RequestMacroTests {
             macroSpecs: testMacros,
         )
     }
+
+    @Test func encodableRequest() {
+        assertMacroExpansion(
+            #"""
+            @EncodableRequest
+            struct MyRequest {
+                @Query var a: Int
+                @Query(key: "bb") var b: String
+                var c: String
+                var d: UInt, e: UInt8, f: UInt16
+            
+                var computedProperty: String { fatalError() }
+            
+                @Query var computedQueryProperty: String { c }
+            }
+            """#,
+            expandedSource: #"""
+            struct MyRequest {
+                var a: Int
+                var b: String
+                var c: String
+                var d: UInt, e: UInt8, f: UInt16
+            
+                var computedProperty: String { fatalError() }
+            
+                var computedQueryProperty: String { c }
+            }
+            
+            extension MyRequest: EncodableRequestProtocol {
+                var encodableQuery: some Swift.Encodable {
+                    struct __macro_local_7WrapperfMu_: Swift.Encodable {
+                        let a: Int
+                        let b: String
+                        let computedQueryProperty: String
+                        enum CodingKeys: String, CodingKey {
+                            case a
+                            case b = "bb"
+                            case computedQueryProperty
+                        }
+                    }
+                    return __macro_local_7WrapperfMu_(a: a, b: b, computedQueryProperty: computedQueryProperty)
+                }
+                var encodableBody: some Swift.Encodable {
+                    struct __macro_local_7WrapperfMu0_: Swift.Encodable {
+                        let c: String
+                        let d: UInt
+                        let e: UInt8
+                        let f: UInt16
+                        enum CodingKeys: String, CodingKey {
+                            case c
+                            case d
+                            case e
+                            case f
+                        }
+                    }
+                    return __macro_local_7WrapperfMu0_(c: c, d: d, e: e, f: f)
+                }
+            }
+            """#,
+            macroSpecs: testMacros,
+        )
+    }
+
+    @Test func encodableRequestWithoutQuery() {
+        assertMacroExpansion(
+            #"""
+            @EncodableRequest
+            struct MyRequest {
+                var inBody: String
+            }
+            """#,
+            expandedSource: #"""
+            struct MyRequest {
+                var inBody: String
+            }
+
+            extension MyRequest: EncodableRequestProtocol {
+                var encodableBody: some Swift.Encodable {
+                    struct __macro_local_7WrapperfMu_: Swift.Encodable {
+                        let inBody: String
+                        enum CodingKeys: String, CodingKey {
+                            case inBody
+                        }
+                    }
+                    return __macro_local_7WrapperfMu_(inBody: inBody)
+                }
+            }
+            """#,
+            macroSpecs: testMacros,
+        )
+    }
+
+    @Test func encodableRequestWithoutBody() {
+        assertMacroExpansion(
+            #"""
+            @EncodableRequest
+            struct MyRequest {
+                @Query var inQuery: String
+            }
+            """#,
+            expandedSource: #"""
+            struct MyRequest {
+                var inQuery: String
+            }
+
+            extension MyRequest: EncodableRequestProtocol {
+                var encodableQuery: some Swift.Encodable {
+                    struct __macro_local_7WrapperfMu_: Swift.Encodable {
+                        let inQuery: String
+                        enum CodingKeys: String, CodingKey {
+                            case inQuery
+                        }
+                    }
+                    return __macro_local_7WrapperfMu_(inQuery: inQuery)
+                }
+            }
+            """#,
+            macroSpecs: testMacros,
+        )
+    }
 }
 
-private let testMacros: [String : MacroSpec] = Dictionary(
+private let requestMacros: [String : MacroSpec] = Dictionary(
     ["HTTPRequest", "GET", "POST"]
         .map {
             ($0, MacroSpec(type: RequestMacro.self, conformances: ["RequestProtocol"]))
         },
     uniquingKeysWith: { $1 },
 )
+
+private let encodableRequestMacros: [String : MacroSpec] = Dictionary(
+    ["EncodableRequest"]
+        .map {
+            (
+                $0,
+                MacroSpec(
+                    type: EncodableRequestMacro.self,
+                    conformances: ["EncodableRequestProtocol"]
+                ),
+            )
+        },
+    uniquingKeysWith: { $1 },
+)
+
+private let markerMacros: [String : MacroSpec] = Dictionary(
+    ["Query"]
+        .map {
+            ($0, MacroSpec(type: MarkerMacro.self))
+        },
+    uniquingKeysWith: { $1 },
+)
+
+private let testMacros = requestMacros
+    .merging(markerMacros, uniquingKeysWith: { $1 })
+    .merging(encodableRequestMacros, uniquingKeysWith: { $1 })
 

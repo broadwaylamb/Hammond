@@ -24,13 +24,7 @@ public struct RequestMacro: ExtensionMacro {
         if declaration is ExtensionDeclSyntax {
             throw RequestMacroDiagnostic.cannotBeAppliedToExtension
         }
-        guard let macroName = node
-            .attributeName
-            .as(IdentifierTypeSyntax.self)?
-            .name
-            .identifier?
-            .name
-        else {
+        guard let macroName = node.macroName else {
             fatalError("Missing macro name in \(node)")
         }
         let args = node.getMacroArguments()
@@ -45,47 +39,13 @@ public struct RequestMacro: ExtensionMacro {
             pathArgumentIndex = 0
         }
 
-        let alreadyHasQueryItemsMember = declaration
-            .varDecls
-            .contains { varDecl in
-                let isStatic = varDecl.modifiers.contains {
-                    $0.name.tokenKind == .keyword(.static) ||
-                        $0.name.tokenKind == .keyword(.class)
-                }
-
-                if isStatic {
-                    return false
-                }
-
-                return varDecl.bindings.contains { binding in
-                    binding.pattern
-                        .as(IdentifierPatternSyntax.self)?
-                        .identifier
-                        .identifier?
-                        .name == "queryItems"
+        do {
+            return try generateConformance(type: type, conformingTo: protocols) {
+                methodMember(httpMethodName)
+                if pathArgumentIndex < args.count {
+                    try pathMember(args[pathArgumentIndex], context: context)
                 }
             }
-
-        do {
-            return [
-                try ExtensionDeclSyntax(
-                    extendedType: type,
-                    inheritanceClause: InheritanceClauseSyntax {
-                        for `protocol` in protocols {
-                            InheritedTypeSyntax(type: `protocol`)
-                        }
-                    },
-                    memberBlockBuilder: {
-                        methodMember(httpMethodName)
-                        if !alreadyHasQueryItemsMember {
-                            queryItemsMember()
-                        }
-                        if pathArgumentIndex < args.count {
-                            try pathMember(args[pathArgumentIndex], context: context)
-                        }
-                    }
-                )
-            ]
         } catch is RequestMacroDiagnostic {
             return []
         }
@@ -141,14 +101,6 @@ public struct RequestMacro: ExtensionMacro {
         return """
         var path: Swift.String {
             return \(newStringLiteral)
-        }
-        """
-    }
-
-    private static func queryItemsMember() -> DeclSyntax {
-        return """
-        var queryItems: [(key: Swift.String, value: Swift.String?)]? {
-            return nil
         }
         """
     }

@@ -5,5 +5,6 @@ import SwiftSyntaxMacros
 struct MyMacroPlugin: CompilerPlugin {
     let providingMacros: [Macro.Type] = [
         RequestMacro.self,
+        MarkerMacro.self,
     ]
 }
