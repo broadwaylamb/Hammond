@@ -45,17 +45,21 @@ public struct EncodableRequestMacro: ExtensionMacro {
 
             return try generateConformance(type: type, conformingTo: protocols) {
                 if !queryVars.isEmpty {
+                    let structName = context.makeUniqueName("EncodableQuery")
+                    try encodableStruct(queryVars, structName: structName)
                     try encodableProperty(
                         queryVars,
                         propertyName: "encodableQuery",
-                        context: context,
+                        structName: structName,
                     )
                 }
                 if !restVars.isEmpty {
+                    let structName = context.makeUniqueName("EncodableBody")
+                    try encodableStruct(restVars, structName: structName)
                     try encodableProperty(
                         restVars,
                         propertyName: "encodableBody",
-                        context: context,
+                        structName: structName,
                     )
                 }
             }
@@ -83,28 +87,33 @@ public struct EncodableRequestMacro: ExtensionMacro {
         return CodingKey(key: keyExpr, identifier: declName, type: type)
     }
 
+    private static func encodableStruct(
+        _ codingKeys: [CodingKey],
+        structName: TokenSyntax,
+    ) throws -> StructDeclSyntax {
+        try StructDeclSyntax("struct \(structName): Swift.Encodable") {
+            for codingKey in codingKeys {
+                VariableDeclSyntax(
+                    .let,
+                    name: PatternSyntax(
+                        fromProtocol: IdentifierPatternSyntax(
+                            identifier: .identifier(codingKey.identifier)
+                        )
+                    ),
+                    type: TypeAnnotationSyntax(type: codingKey.type),
+                )
+            }
+            try codingKeys.generateCodingKeysEnum()
+        }
+    }
+
     private static func encodableProperty(
         _ codingKeys: [CodingKey],
         propertyName: String,
-        context: MacroExpansionContext
+        structName: TokenSyntax,
     ) throws -> VariableDeclSyntax {
         let varName = TokenSyntax.identifier(propertyName)
         return try VariableDeclSyntax("var \(varName): some Swift.Encodable") {
-            let structName = context.makeUniqueName("Wrapper")
-            try StructDeclSyntax("struct \(structName): Swift.Encodable") {
-                for codingKey in codingKeys {
-                    VariableDeclSyntax(
-                        .let,
-                        name: PatternSyntax(
-                            fromProtocol: IdentifierPatternSyntax(
-                                identifier: .identifier(codingKey.identifier)
-                            )
-                        ),
-                        type: TypeAnnotationSyntax(type: codingKey.type),
-                    )
-                }
-                try codingKeys.generateCodingKeysEnum()
-            }
             ReturnStmtSyntax(
                 expression: FunctionCallExprSyntax(
                     callee: DeclReferenceExprSyntax(baseName: structName)

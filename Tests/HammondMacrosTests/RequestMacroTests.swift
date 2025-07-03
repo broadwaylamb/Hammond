@@ -302,40 +302,40 @@ struct RequestMacroTests {
                 var b: String
                 var c: String
                 var d: UInt, e: UInt8, f: UInt16
-            
+
                 var computedProperty: String { fatalError() }
-            
+
                 var computedQueryProperty: String { c }
             }
-            
+
             extension MyRequest: EncodableRequestProtocol {
-                var encodableQuery: some Swift.Encodable {
-                    struct __macro_local_7WrapperfMu_: Swift.Encodable {
-                        let a: Int
-                        let b: String
-                        let computedQueryProperty: String
-                        enum CodingKeys: String, CodingKey {
-                            case a
-                            case b = "bb"
-                            case computedQueryProperty
-                        }
+                struct __macro_local_14EncodableQueryfMu_: Swift.Encodable {
+                    let a: Int
+                    let b: String
+                    let computedQueryProperty: String
+                    enum CodingKeys: String, CodingKey {
+                        case a
+                        case b = "bb"
+                        case computedQueryProperty
                     }
-                    return __macro_local_7WrapperfMu_(a: a, b: b, computedQueryProperty: computedQueryProperty)
+                }
+                var encodableQuery: some Swift.Encodable {
+                    return __macro_local_14EncodableQueryfMu_(a: a, b: b, computedQueryProperty: computedQueryProperty)
+                }
+                struct __macro_local_13EncodableBodyfMu_: Swift.Encodable {
+                    let c: String
+                    let d: UInt
+                    let e: UInt8
+                    let f: UInt16
+                    enum CodingKeys: String, CodingKey {
+                        case c
+                        case d
+                        case e
+                        case f
+                    }
                 }
                 var encodableBody: some Swift.Encodable {
-                    struct __macro_local_7WrapperfMu0_: Swift.Encodable {
-                        let c: String
-                        let d: UInt
-                        let e: UInt8
-                        let f: UInt16
-                        enum CodingKeys: String, CodingKey {
-                            case c
-                            case d
-                            case e
-                            case f
-                        }
-                    }
-                    return __macro_local_7WrapperfMu0_(c: c, d: d, e: e, f: f)
+                    return __macro_local_13EncodableBodyfMu_(c: c, d: d, e: e, f: f)
                 }
             }
             """#,
@@ -357,14 +357,14 @@ struct RequestMacroTests {
             }
 
             extension MyRequest: EncodableRequestProtocol {
-                var encodableBody: some Swift.Encodable {
-                    struct __macro_local_7WrapperfMu_: Swift.Encodable {
-                        let inBody: String
-                        enum CodingKeys: String, CodingKey {
-                            case inBody
-                        }
+                struct __macro_local_13EncodableBodyfMu_: Swift.Encodable {
+                    let inBody: String
+                    enum CodingKeys: String, CodingKey {
+                        case inBody
                     }
-                    return __macro_local_7WrapperfMu_(inBody: inBody)
+                }
+                var encodableBody: some Swift.Encodable {
+                    return __macro_local_13EncodableBodyfMu_(inBody: inBody)
                 }
             }
             """#,
@@ -386,14 +386,14 @@ struct RequestMacroTests {
             }
 
             extension MyRequest: EncodableRequestProtocol {
-                var encodableQuery: some Swift.Encodable {
-                    struct __macro_local_7WrapperfMu_: Swift.Encodable {
-                        let inQuery: String
-                        enum CodingKeys: String, CodingKey {
-                            case inQuery
-                        }
+                struct __macro_local_14EncodableQueryfMu_: Swift.Encodable {
+                    let inQuery: String
+                    enum CodingKeys: String, CodingKey {
+                        case inQuery
                     }
-                    return __macro_local_7WrapperfMu_(inQuery: inQuery)
+                }
+                var encodableQuery: some Swift.Encodable {
+                    return __macro_local_14EncodableQueryfMu_(inQuery: inQuery)
                 }
             }
             """#,
