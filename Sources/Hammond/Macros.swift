@@ -89,7 +89,9 @@ public macro CONNECT() =
     extension,
     conformances: EncodableRequestProtocol,
     names: named(encodableQuery),
-    named(encodableBody)
+    named(encodableBody),
+    named(EncodableQuery),
+    named(EncodableBody)
 )
 public macro EncodableRequest() =
     #externalMacro(module: "HammondMacros", type: "EncodableRequestMacro")
