@@ -89,9 +89,9 @@ public struct EncodableRequestMacro: ExtensionMacro {
         context: MacroExpansionContext
     ) throws -> VariableDeclSyntax {
         let varName = TokenSyntax.identifier(propertyName)
-        return try VariableDeclSyntax("var \(varName): some Swift.Encodable") {
+        return try VariableDeclSyntax("var \(varName): some Hammond.NeverEncodable") {
             let structName = context.makeUniqueName("Wrapper")
-            try StructDeclSyntax("struct \(structName): Swift.Encodable") {
+            try StructDeclSyntax("struct \(structName): Hammond.NeverEncodable") {
                 for codingKey in codingKeys {
                     VariableDeclSyntax(
                         .let,
