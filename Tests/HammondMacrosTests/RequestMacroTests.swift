@@ -319,7 +319,7 @@ struct RequestMacroTests {
                         case computedQueryProperty
                     }
                 }
-                var encodableQuery: some Swift.Encodable {
+                var encodableQuery: (some Swift.Encodable)? {
                     return __macro_local_14EncodableQueryfMu_(a: a, b: b, computedQueryProperty: computedQueryProperty)
                 }
                 struct __macro_local_13EncodableBodyfMu_: Swift.Encodable {
@@ -334,7 +334,7 @@ struct RequestMacroTests {
                         case f
                     }
                 }
-                var encodableBody: some Swift.Encodable {
+                var encodableBody: (some Swift.Encodable)? {
                     return __macro_local_13EncodableBodyfMu_(c: c, d: d, e: e, f: f)
                 }
             }
@@ -363,7 +363,7 @@ struct RequestMacroTests {
                         case inBody
                     }
                 }
-                var encodableBody: some Swift.Encodable {
+                var encodableBody: (some Swift.Encodable)? {
                     return __macro_local_13EncodableBodyfMu_(inBody: inBody)
                 }
             }
@@ -392,7 +392,7 @@ struct RequestMacroTests {
                         case inQuery
                     }
                 }
-                var encodableQuery: some Swift.Encodable {
+                var encodableQuery: (some Swift.Encodable)? {
                     return __macro_local_14EncodableQueryfMu_(inQuery: inQuery)
                 }
             }
