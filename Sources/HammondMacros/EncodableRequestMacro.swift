@@ -45,7 +45,7 @@ public struct EncodableRequestMacro: ExtensionMacro {
 
             return try generateConformance(type: type, conformingTo: protocols) {
                 if !queryVars.isEmpty {
-                    let structName = TokenSyntax.identifier("EncodableQuery")
+                    let structName = context.makeUniqueName("EncodableQuery")
                     try encodableStruct(queryVars, structName: structName)
                     try encodableProperty(
                         queryVars,
@@ -54,7 +54,7 @@ public struct EncodableRequestMacro: ExtensionMacro {
                     )
                 }
                 if !restVars.isEmpty {
-                    let structName = TokenSyntax.identifier("EncodableBody")
+                    let structName = context.makeUniqueName("EncodableBody")
                     try encodableStruct(restVars, structName: structName)
                     try encodableProperty(
                         restVars,
@@ -113,7 +113,7 @@ public struct EncodableRequestMacro: ExtensionMacro {
         structName: TokenSyntax,
     ) throws -> VariableDeclSyntax {
         let varName = TokenSyntax.identifier(propertyName)
-        return try VariableDeclSyntax("var \(varName): \(structName)") {
+        return try VariableDeclSyntax("var \(varName): some Swift.Encodable") {
             ReturnStmtSyntax(
                 expression: FunctionCallExprSyntax(
                     callee: DeclReferenceExprSyntax(baseName: structName)

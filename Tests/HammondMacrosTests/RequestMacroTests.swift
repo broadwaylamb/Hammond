@@ -309,7 +309,7 @@ struct RequestMacroTests {
             }
 
             extension MyRequest: EncodableRequestProtocol {
-                struct EncodableQuery: Swift.Encodable {
+                struct __macro_local_14EncodableQueryfMu_: Swift.Encodable {
                     let a: Int
                     let b: String
                     let computedQueryProperty: String
@@ -319,10 +319,10 @@ struct RequestMacroTests {
                         case computedQueryProperty
                     }
                 }
-                var encodableQuery: EncodableQuery {
-                    return EncodableQuery(a: a, b: b, computedQueryProperty: computedQueryProperty)
+                var encodableQuery: some Swift.Encodable {
+                    return __macro_local_14EncodableQueryfMu_(a: a, b: b, computedQueryProperty: computedQueryProperty)
                 }
-                struct EncodableBody: Swift.Encodable {
+                struct __macro_local_13EncodableBodyfMu_: Swift.Encodable {
                     let c: String
                     let d: UInt
                     let e: UInt8
@@ -334,8 +334,8 @@ struct RequestMacroTests {
                         case f
                     }
                 }
-                var encodableBody: EncodableBody {
-                    return EncodableBody(c: c, d: d, e: e, f: f)
+                var encodableBody: some Swift.Encodable {
+                    return __macro_local_13EncodableBodyfMu_(c: c, d: d, e: e, f: f)
                 }
             }
             """#,
@@ -357,14 +357,14 @@ struct RequestMacroTests {
             }
 
             extension MyRequest: EncodableRequestProtocol {
-                struct EncodableBody: Swift.Encodable {
+                struct __macro_local_13EncodableBodyfMu_: Swift.Encodable {
                     let inBody: String
                     enum CodingKeys: String, CodingKey {
                         case inBody
                     }
                 }
-                var encodableBody: EncodableBody {
-                    return EncodableBody(inBody: inBody)
+                var encodableBody: some Swift.Encodable {
+                    return __macro_local_13EncodableBodyfMu_(inBody: inBody)
                 }
             }
             """#,
@@ -386,14 +386,14 @@ struct RequestMacroTests {
             }
 
             extension MyRequest: EncodableRequestProtocol {
-                struct EncodableQuery: Swift.Encodable {
+                struct __macro_local_14EncodableQueryfMu_: Swift.Encodable {
                     let inQuery: String
                     enum CodingKeys: String, CodingKey {
                         case inQuery
                     }
                 }
-                var encodableQuery: EncodableQuery {
-                    return EncodableQuery(inQuery: inQuery)
+                var encodableQuery: some Swift.Encodable {
+                    return __macro_local_14EncodableQueryfMu_(inQuery: inQuery)
                 }
             }
             """#,
