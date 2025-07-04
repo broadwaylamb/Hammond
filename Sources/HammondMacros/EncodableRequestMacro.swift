@@ -91,7 +91,7 @@ public struct EncodableRequestMacro: ExtensionMacro {
         _ codingKeys: [CodingKey],
         structName: TokenSyntax,
     ) throws -> StructDeclSyntax {
-        try StructDeclSyntax("struct \(structName): Swift.Encodable") {
+        try StructDeclSyntax("private struct \(structName): Swift.Encodable") {
             for codingKey in codingKeys {
                 VariableDeclSyntax(
                     .let,
@@ -113,7 +113,7 @@ public struct EncodableRequestMacro: ExtensionMacro {
         structName: TokenSyntax,
     ) throws -> VariableDeclSyntax {
         let varName = TokenSyntax.identifier(propertyName)
-        return try VariableDeclSyntax("var \(varName): (some Swift.Encodable)?") {
+        return try VariableDeclSyntax("public var \(varName): (some Swift.Encodable)?") {
             ReturnStmtSyntax(
                 expression: FunctionCallExprSyntax(
                     callee: DeclReferenceExprSyntax(baseName: structName)

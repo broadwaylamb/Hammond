@@ -55,7 +55,7 @@ public struct RequestMacro: ExtensionMacro {
         _ httpMethodName: ExprSyntax,
     ) -> DeclSyntax {
         """
-        static let method = Hammond.HTTPMethod(rawValue: \(httpMethodName))
+        public static let method = Hammond.HTTPMethod(rawValue: \(httpMethodName))
         """
     }
 
@@ -99,7 +99,7 @@ public struct RequestMacro: ExtensionMacro {
         )
 
         return """
-        var path: Swift.String {
+        public var path: Swift.String {
             return \(newStringLiteral)
         }
         """

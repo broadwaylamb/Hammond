@@ -28,8 +28,8 @@ struct RequestMacroTests {
             }
             
             extension MyGetRequest: RequestProtocol {
-                static let method = Hammond.HTTPMethod(rawValue: "GET")
-                var path: Swift.String {
+                public static let method = Hammond.HTTPMethod(rawValue: "GET")
+                public var path: Swift.String {
                     return "/myget/\(a)/\(b)"
                 }
             }
@@ -48,8 +48,8 @@ struct RequestMacroTests {
             struct MyGetRequest {}
             
             extension MyGetRequest: RequestProtocol {
-                static let method = Hammond.HTTPMethod(rawValue: "whatever123")
-                var path: Swift.String {
+                public static let method = Hammond.HTTPMethod(rawValue: "whatever123")
+                public var path: Swift.String {
                     return "/foobar"
                 }
             }
@@ -74,8 +74,8 @@ struct RequestMacroTests {
             }
             
             extension MyGetRequest: RequestProtocol {
-                static let method = Hammond.HTTPMethod(rawValue: "GET")
-                var path: Swift.String {
+                public static let method = Hammond.HTTPMethod(rawValue: "GET")
+                public var path: Swift.String {
                     return "/myget/\u{41}"
                 }
             }
@@ -125,7 +125,7 @@ struct RequestMacroTests {
             }
             
             extension MyGetRequest: RequestProtocol {
-                static let method = Hammond.HTTPMethod(rawValue: "POST")
+                public static let method = Hammond.HTTPMethod(rawValue: "POST")
             }
             """,
             macroSpecs: testMacros,
@@ -309,7 +309,7 @@ struct RequestMacroTests {
             }
 
             extension MyRequest: EncodableRequestProtocol {
-                struct __macro_local_14EncodableQueryfMu_: Swift.Encodable {
+                private struct __macro_local_14EncodableQueryfMu_: Swift.Encodable {
                     let a: Int
                     let b: String
                     let computedQueryProperty: String
@@ -319,10 +319,10 @@ struct RequestMacroTests {
                         case computedQueryProperty
                     }
                 }
-                var encodableQuery: (some Swift.Encodable)? {
+                public var encodableQuery: (some Swift.Encodable)? {
                     return __macro_local_14EncodableQueryfMu_(a: a, b: b, computedQueryProperty: computedQueryProperty)
                 }
-                struct __macro_local_13EncodableBodyfMu_: Swift.Encodable {
+                private struct __macro_local_13EncodableBodyfMu_: Swift.Encodable {
                     let c: String
                     let d: UInt
                     let e: UInt8
@@ -334,7 +334,7 @@ struct RequestMacroTests {
                         case f
                     }
                 }
-                var encodableBody: (some Swift.Encodable)? {
+                public var encodableBody: (some Swift.Encodable)? {
                     return __macro_local_13EncodableBodyfMu_(c: c, d: d, e: e, f: f)
                 }
             }
@@ -357,13 +357,13 @@ struct RequestMacroTests {
             }
 
             extension MyRequest: EncodableRequestProtocol {
-                struct __macro_local_13EncodableBodyfMu_: Swift.Encodable {
+                private struct __macro_local_13EncodableBodyfMu_: Swift.Encodable {
                     let inBody: String
                     enum CodingKeys: String, CodingKey {
                         case inBody
                     }
                 }
-                var encodableBody: (some Swift.Encodable)? {
+                public var encodableBody: (some Swift.Encodable)? {
                     return __macro_local_13EncodableBodyfMu_(inBody: inBody)
                 }
             }
@@ -386,13 +386,13 @@ struct RequestMacroTests {
             }
 
             extension MyRequest: EncodableRequestProtocol {
-                struct __macro_local_14EncodableQueryfMu_: Swift.Encodable {
+                private struct __macro_local_14EncodableQueryfMu_: Swift.Encodable {
                     let inQuery: String
                     enum CodingKeys: String, CodingKey {
                         case inQuery
                     }
                 }
-                var encodableQuery: (some Swift.Encodable)? {
+                public var encodableQuery: (some Swift.Encodable)? {
                     return __macro_local_14EncodableQueryfMu_(inQuery: inQuery)
                 }
             }
