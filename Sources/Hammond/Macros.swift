@@ -116,6 +116,6 @@ public macro Query() = #externalMacro(
         CustomDebugStringConvertible,
     names: named(debugDescription)
 )
-@attached(member, names: named(rawValue), named(`init`))
+@attached(member, names: named(rawValue), named(init(rawValue:)))
 public macro Newtype<RawValue: Codable & Hashable & Equatable>() =
     #externalMacro(module: "HammondMacros", type: "NewtypeMacro")
