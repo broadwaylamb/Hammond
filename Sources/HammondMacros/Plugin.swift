@@ -7,5 +7,6 @@ struct MyMacroPlugin: CompilerPlugin {
         RequestMacro.self,
         MarkerMacro.self,
         EncodableRequestMacro.self,
+        NewtypeMacro.self,
     ]
 }

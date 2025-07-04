@@ -105,3 +105,17 @@ public macro Query() = #externalMacro(
     module: "HammondMacros",
     type: "MarkerMacro"
 )
+
+@attached(
+    extension,
+    conformances:
+        RawRepresentable,
+        Codable,
+        Hashable,
+        Equatable,
+        CustomDebugStringConvertible,
+    names: named(debugDescription)
+)
+@attached(member, names: named(rawValue), named(`init`))
+public macro Newtype<RawValue: Codable & Hashable & Equatable>() =
+    #externalMacro(module: "HammondMacros", type: "NewtypeMacro")
