@@ -21,6 +21,11 @@ public struct NewtypeMacro: ExtensionMacro, MemberMacro {
             return []
         }
         return try generateConformance(type: type, conformingTo: protocols) {
+            try VariableDeclSyntax("public var description: Swift.String") {
+                """
+                return Swift.String(describing: rawValue)
+                """
+            }
             try VariableDeclSyntax("public var debugDescription: Swift.String") {
                 """
                 return Swift.String(reflecting: rawValue)

@@ -15,7 +15,7 @@ struct NewtypeMacroTests {
     @Test func newtypeMacro() {
         assertMacroExpansion(
             """
-            @Newtype<Int>()
+            @Newtype<Int>
             struct S {}
             """,
             expandedSource: """
@@ -29,6 +29,9 @@ struct NewtypeMacroTests {
             }
 
             extension S: RawRepresentable, Codable, Hashable, Equatable, CustomDebugStringConvertible {
+                public var description: Swift.String {
+                    return Swift.String(describing: rawValue)
+                }
                 public var debugDescription: Swift.String {
                     return Swift.String(reflecting: rawValue)
                 }

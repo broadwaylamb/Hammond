@@ -113,8 +113,9 @@ public macro Query() = #externalMacro(
         Codable,
         Hashable,
         Equatable,
+        CustomStringConvertible,
         CustomDebugStringConvertible,
-    names: named(debugDescription)
+    names: named(debugDescription), named(description)
 )
 @attached(member, names: named(rawValue), named(init(rawValue:)))
 public macro Newtype<RawValue: Codable & Hashable & Equatable>() =
