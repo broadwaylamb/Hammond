@@ -13,12 +13,11 @@ jobs:
     strategy:
       matrix:
         os: 
-          - ubuntu-22.04 # https://github.com/swift-actions/setup-swift/issues/677
+          - ubuntu-latest
           - macos-latest
 
     steps:
     - uses: actions/checkout@v4
-    - uses: swift-actions/setup-swift@v2
     - name: Run tests
       run: swift test
   
