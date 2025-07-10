@@ -43,6 +43,17 @@ extension VariableDeclSyntax {
             }
         }
     }
+
+    var isStaticOrClass: Bool {
+        modifiers.contains {
+            switch $0.name.tokenKind {
+            case .keyword(.static), .keyword(.class):
+                return true
+            default:
+                return false
+            }
+        }
+    }
 }
 
 extension PatternBindingSyntax {

@@ -20,6 +20,7 @@ public struct EncodableRequestMacro: ExtensionMacro {
     ) throws -> [ExtensionDeclSyntax] {
         do {
             let varDecls = declaration.varDecls
+                .filter { !$0.isStaticOrClass }
             let queryVars: [CodingKey] = try varDecls
                 .compactMap { try parseCodingKey($0, macroName: "Query") }
 

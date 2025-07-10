@@ -400,6 +400,56 @@ struct RequestMacroTests {
             macroSpecs: testMacros,
         )
     }
+
+    @Test func ignoresStaticPropertiesInEncodableRequest() {
+        assertMacroExpansion(
+            #"""
+            @EncodableRequest
+            class MyRequest {
+                @Query var inQuery: String
+                var inBody: String
+                
+                static let staticProp1 = 1
+                static var staticProp2 = 2
+                class let staticProp3 = 3
+                class var staticProp4 = 4
+            }
+            """#,
+            expandedSource: #"""
+            class MyRequest {
+                var inQuery: String
+                var inBody: String
+                
+                static let staticProp1 = 1
+                static var staticProp2 = 2
+                class let staticProp3 = 3
+                class var staticProp4 = 4
+            }
+
+            extension MyRequest: EncodableRequestProtocol {
+                private struct __macro_local_14EncodableQueryfMu_: Swift.Encodable {
+                    let inQuery: String
+                    enum CodingKeys: String, CodingKey {
+                        case inQuery
+                    }
+                }
+                public var encodableQuery: (some Swift.Encodable)? {
+                    return __macro_local_14EncodableQueryfMu_(inQuery: inQuery)
+                }
+                private struct __macro_local_13EncodableBodyfMu_: Swift.Encodable {
+                    let inBody: String
+                    enum CodingKeys: String, CodingKey {
+                        case inBody
+                    }
+                }
+                public var encodableBody: (some Swift.Encodable)? {
+                    return __macro_local_13EncodableBodyfMu_(inBody: inBody)
+                }
+            }
+            """#,
+            macroSpecs: testMacros,
+        )
+    }
 }
 
 private let requestMacros: [String : MacroSpec] = Dictionary(
