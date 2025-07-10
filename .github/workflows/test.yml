@@ -12,7 +12,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: 
+          - ubuntu-22.04 # https://github.com/swift-actions/setup-swift/issues/677
+          - macos-latest
 
     steps:
     - uses: actions/checkout@v4
