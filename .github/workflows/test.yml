@@ -1,0 +1,23 @@
+name: Run tests
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+    - uses: k-arindam/setup-swift@v6.0.0
+      with:
+        swift-version: "6.1"
+    - name: Run tests
+      run: swift test
+  
