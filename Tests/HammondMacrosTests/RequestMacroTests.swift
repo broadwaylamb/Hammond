@@ -450,6 +450,45 @@ struct RequestMacroTests {
             macroSpecs: testMacros,
         )
     }
+
+    @Test func ignoresPathVariablesInEncodableRequest() {
+        assertMacroExpansion(
+            #"""
+            @POST("/{inPath}")
+            @EncodableRequest
+            class MyRequest {
+                var inPath: String
+                var inBody: String
+            }
+            """#,
+            expandedSource: #"""
+            class MyRequest {
+                var inPath: String
+                var inBody: String
+            }
+
+            extension MyRequest: RequestProtocol {
+                public static let method = Hammond.HTTPMethod(rawValue: "POST")
+                public var path: Swift.String {
+                    return "/\(inPath)"
+                }
+            }
+
+            extension MyRequest: EncodableRequestProtocol {
+                private struct __macro_local_13EncodableBodyfMu_: Swift.Encodable {
+                    let inBody: String
+                    enum CodingKeys: String, CodingKey {
+                        case inBody
+                    }
+                }
+                public var encodableBody: (some Swift.Encodable)? {
+                    return __macro_local_13EncodableBodyfMu_(inBody: inBody)
+                }
+            }
+            """#,
+            macroSpecs: testMacros,
+        )
+    }
 }
 
 private let requestMacros: [String : MacroSpec] = Dictionary(

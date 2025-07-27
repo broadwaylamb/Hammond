@@ -24,6 +24,8 @@ public struct EncodableRequestMacro: ExtensionMacro {
             let queryVars: [CodingKey] = try varDecls
                 .compactMap { try parseCodingKey($0, macroName: "Query") }
 
+            let pathVars = variableNamesReferencedInPath(declaration: declaration)
+
             let restVars: [CodingKey] = try varDecls.flatMap { varDecl -> [CodingKey] in
                 if !varDecl.getMacros(name: "Query").isEmpty { return [] }
                 return try varDecl.bindings
@@ -38,6 +40,9 @@ public struct EncodableRequestMacro: ExtensionMacro {
                             throw error
                         }
                         guard let identifier = binding.propertyName else {
+                            return nil
+                        }
+                        if pathVars.contains(identifier) {
                             return nil
                         }
                         return CodingKey(identifier: identifier, type: type.type)
@@ -67,6 +72,25 @@ public struct EncodableRequestMacro: ExtensionMacro {
         } catch is EncodableRequestMacroDiagnostic {
             return []
         }
+    }
+
+    private static func variableNamesReferencedInPath(
+        declaration: some DeclGroupSyntax,
+    ) -> [String] {
+        for attributeListElement in declaration.attributes {
+            guard case .attribute(let attribute) = attributeListElement else { continue }
+            guard RequestMacro.isRequestMacro(attribute) else { continue }
+            do {
+                return try RequestMacro
+                    .parseRequestInfo(node: attribute, declaration: declaration)
+                    .variableNamesReferencedInPath ?? []
+            } catch {
+                // Don't handle the error, as it's already been handled in the
+                // corresponding macro
+                return []
+            }
+        }
+        return []
     }
 
     private static func parseCodingKey(
