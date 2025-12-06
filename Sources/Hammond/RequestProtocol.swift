@@ -11,8 +11,8 @@ public protocol RequestProtocol {
 }
 
 public protocol EncodableRequestProtocol {
-    associatedtype EncodableQuery: Encodable = NeverEncodable
-    associatedtype EncodableBody: Encodable = NeverEncodable
+    associatedtype EncodableQuery: Encodable = NeverCodable
+    associatedtype EncodableBody: Encodable = NeverCodable
 
     var encodableQuery: EncodableQuery? { get }
     var encodableBody: EncodableBody? { get }
