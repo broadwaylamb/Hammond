@@ -33,21 +33,21 @@ public protocol DecodableRequestProtocol: RequestProtocol {
     associatedtype ServerError: ServerErrorProtocol
     associatedtype ResponseBody
 
-    static func deserializeError(from body: ResponseBody) throws -> ServerError
+    func deserializeError(from body: ResponseBody) throws -> ServerError
 
-    static func deserializeResult(from body: ResponseBody) throws -> Result
+    func deserializeResult(from body: ResponseBody) throws -> Result
 
-    static func extractError(
+    func extractError(
         from response: some ResponseProtocol<ResponseBody>
     ) throws -> ServerError
 
-    static func extractResult(
+    func extractResult(
         from response: some ResponseProtocol<ResponseBody>
     ) throws -> Result
 }
 
 extension DecodableRequestProtocol {
-    public static func extractError(
+    public func extractError(
         from response: some ResponseProtocol<ResponseBody>
     ) throws -> ServerError {
         do {
@@ -64,7 +64,7 @@ extension DecodableRequestProtocol {
 }
 
 extension DecodableRequestProtocol {
-    public static func extractResult(
+    public func extractResult(
         from response: some ResponseProtocol<ResponseBody>
     ) throws -> Result {
         if response.statusCode.category == .success {
@@ -76,11 +76,11 @@ extension DecodableRequestProtocol {
 }
 
 extension DecodableRequestProtocol where Result == Void {
-    public static func deserializeResult(from body: ResponseBody) throws -> Void {}
+    public func deserializeResult(from body: ResponseBody) throws -> Void {}
 }
 
 extension DecodableRequestProtocol where Result == ResponseBody {
-    public static func extractResult(
+    public func extractResult(
         from response: some ResponseProtocol<ResponseBody>
     ) throws -> ResponseBody  {
         if response.statusCode.category == .success {
