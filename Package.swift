@@ -14,22 +14,26 @@ let package = Package(
     ],
     products: [
         .library(name: "Hammond", targets: ["Hammond"]),
+        .library(name: "HammondMacros", targets: ["HammondMacros"]),
         .library(name: "HammondEncoders", targets: ["HammondEncoders"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-syntax", from: "601.0.1"),
+        .package(url: "https://github.com/swiftlang/swift-syntax", from: "602.0.0"),
     ],
     targets: [
         .target(
             name: "Hammond",
-            dependencies: ["HammondMacros"],
         ),
         .target(
             name: "HammondEncoders",
             dependencies: ["Hammond"],
         ),
-        .macro(
+        .target(
             name: "HammondMacros",
+            dependencies: ["Hammond", "HammondMacroEngine"],
+        ),
+        .macro(
+            name: "HammondMacroEngine",
             dependencies: [
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
@@ -38,7 +42,7 @@ let package = Package(
         .testTarget(
             name: "HammondMacrosTests",
             dependencies: [
-                "HammondMacros",
+                "HammondMacroEngine",
                 .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
             ],
         )

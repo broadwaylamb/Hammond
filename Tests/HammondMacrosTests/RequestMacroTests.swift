@@ -6,7 +6,7 @@
 //
 
 import Testing
-import HammondMacros
+import HammondMacroEngine
 import SwiftSyntaxMacros
 import SwiftSyntaxMacroExpansion
 import SwiftSyntaxMacrosGenericTestSupport

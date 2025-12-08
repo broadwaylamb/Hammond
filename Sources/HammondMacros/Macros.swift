@@ -5,6 +5,8 @@
 //  Created by Sergej Jaskiewicz on 29/06/2025.
 //
 
+import Hammond
+
 /// Provides an implementation of ``RequestProtocol``.
 ///
 /// Example:
@@ -20,7 +22,7 @@
 ///     The path may mention the request's properties using the `{propertyName}` syntax.
 @attached(extension, conformances: RequestProtocol, names: named(method), named(path))
 public macro HTTPRequest(_ name: String, _ path: String) =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -37,7 +39,7 @@ public macro HTTPRequest(_ name: String, _ path: String) =
 ///     The path may mention the request's properties using the `{propertyName}` syntax.
 @attached(extension, conformances: RequestProtocol, names: named(method))
 public macro HTTPRequest(_ name: String) =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -53,7 +55,7 @@ public macro HTTPRequest(_ name: String) =
 ///     The path may mention the request's properties using the `{propertyName}` syntax.
 @attached(extension, conformances: RequestProtocol, names: named(method), named(path))
 public macro OPTIONS(_ path: String) =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -67,7 +69,7 @@ public macro OPTIONS(_ path: String) =
 /// ```
 @attached(extension, conformances: RequestProtocol, names: named(method))
 public macro OPTIONS() =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -83,7 +85,7 @@ public macro OPTIONS() =
 ///     The path may mention the request's properties using the `{propertyName}` syntax.
 @attached(extension, conformances: RequestProtocol, names: named(method), named(path))
 public macro GET(_ path: String) =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -97,7 +99,7 @@ public macro GET(_ path: String) =
 /// ```
 @attached(extension, conformances: RequestProtocol, names: named(method))
 public macro GET() =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -113,7 +115,7 @@ public macro GET() =
 ///     The path may mention the request's properties using the `{propertyName}` syntax.
 @attached(extension, conformances: RequestProtocol, names: named(method), named(path))
 public macro HEAD(_ path: String) =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -126,7 +128,7 @@ public macro HEAD(_ path: String) =
 /// }
 @attached(extension, conformances: RequestProtocol, names: named(method))
 public macro HEAD() =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -142,7 +144,7 @@ public macro HEAD() =
 ///     The path may mention the request's properties using the `{propertyName}` syntax.
 @attached(extension, conformances: RequestProtocol, names: named(method), named(path))
 public macro POST(_ path: String) =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -156,7 +158,7 @@ public macro POST(_ path: String) =
 /// ```
 @attached(extension, conformances: RequestProtocol, names: named(method))
 public macro POST() =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -172,7 +174,7 @@ public macro POST() =
 ///     The path may mention the request's properties using the `{propertyName}` syntax.
 @attached(extension, conformances: RequestProtocol, names: named(method), named(path))
 public macro PUT(_ path: String) =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -186,7 +188,7 @@ public macro PUT(_ path: String) =
 /// ```
 @attached(extension, conformances: RequestProtocol, names: named(method))
 public macro PUT() =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -202,7 +204,7 @@ public macro PUT() =
 ///     The path may mention the request's properties using the `{propertyName}` syntax.
 @attached(extension, conformances: RequestProtocol, names: named(method), named(path))
 public macro PATCH(_ path: String) =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -216,7 +218,7 @@ public macro PATCH(_ path: String) =
 /// ```
 @attached(extension, conformances: RequestProtocol, names: named(method))
 public macro PATCH() =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -232,7 +234,7 @@ public macro PATCH() =
 ///     The path may mention the request's properties using the `{propertyName}` syntax.
 @attached(extension, conformances: RequestProtocol, names: named(method), named(path))
 public macro DELETE(_ path: String) =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -246,7 +248,7 @@ public macro DELETE(_ path: String) =
 /// ```
 @attached(extension, conformances: RequestProtocol, names: named(method))
 public macro DELETE() =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -262,7 +264,7 @@ public macro DELETE() =
 ///     The path may mention the request's properties using the `{propertyName}` syntax.
 @attached(extension, conformances: RequestProtocol, names: named(method), named(path))
 public macro TRACE(_ path: String) =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -276,7 +278,7 @@ public macro TRACE(_ path: String) =
 /// ```
 @attached(extension, conformances: RequestProtocol, names: named(method))
 public macro TRACE() =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -292,7 +294,7 @@ public macro TRACE() =
 ///     The path may mention the request's properties using the `{propertyName}` syntax.
 @attached(extension, conformances: RequestProtocol, names: named(method), named(path))
 public macro CONNECT(_ path: String) =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``RequestProtocol``.
 ///
@@ -306,7 +308,7 @@ public macro CONNECT(_ path: String) =
 /// ```
 @attached(extension, conformances: RequestProtocol, names: named(method), named(path))
 public macro CONNECT() =
-    #externalMacro(module: "HammondMacros", type: "RequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "RequestMacro")
 
 /// Provides an implementation of ``EncodableRequestProtocol``.
 ///
@@ -320,7 +322,7 @@ public macro CONNECT() =
     named(encodableBody)
 )
 public macro EncodableRequest() =
-    #externalMacro(module: "HammondMacros", type: "EncodableRequestMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "EncodableRequestMacro")
 
 /// Indicates that this stored property should be used to build
 /// ``EncodableRequestProtocol/encodableQuery`` when the containing type is
@@ -330,7 +332,7 @@ public macro EncodableRequest() =
 ///     for encoding this property in ``EncodableRequestProtocol/encodableQuery``.
 @attached(peer)
 public macro Query(key: String) = #externalMacro(
-    module: "HammondMacros",
+    module: "HammondMacroEngine",
     type: "MarkerMacro"
 )
 
@@ -339,7 +341,7 @@ public macro Query(key: String) = #externalMacro(
 /// annotated with ``EncodableRequest()``.
 @attached(peer)
 public macro Query() = #externalMacro(
-    module: "HammondMacros",
+    module: "HammondMacroEngine",
     type: "MarkerMacro"
 )
 
@@ -369,4 +371,4 @@ public macro Query() = #externalMacro(
 )
 @attached(member, names: named(rawValue), named(init(rawValue:)))
 public macro Newtype<RawValue: Codable & Hashable & Equatable>() =
-    #externalMacro(module: "HammondMacros", type: "NewtypeMacro")
+    #externalMacro(module: "HammondMacroEngine", type: "NewtypeMacro")
