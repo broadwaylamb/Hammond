@@ -14,6 +14,7 @@ let package = Package(
     ],
     products: [
         .library(name: "Hammond", targets: ["Hammond"]),
+        .library(name: "HammondEncoders", targets: ["HammondEncoders"]),
     ],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-syntax", from: "601.0.1"),
@@ -21,7 +22,11 @@ let package = Package(
     targets: [
         .target(
             name: "Hammond",
-            dependencies: ["HammondMacros"]
+            dependencies: ["HammondMacros"],
+        ),
+        .target(
+            name: "HammondEncoders",
+            dependencies: ["Hammond"],
         ),
         .macro(
             name: "HammondMacros",

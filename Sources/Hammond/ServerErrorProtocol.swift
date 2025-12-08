@@ -6,5 +6,6 @@
 //
 
 public protocol ServerErrorProtocol: Error {
+    /// Construct a default error for the passed status code.
     static func defaultError(for statusCode: HTTPStatusCode) -> Self
 }
