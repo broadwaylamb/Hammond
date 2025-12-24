@@ -51,6 +51,7 @@ public struct URLEncodedFormEncoder: Sendable {
         /// Specified array encoding.
         public var arrayEncoding: ArrayEncoding
         public var dateEncodingStrategy: DateEncodingStrategy
+        public var stableKeyOrder: Bool
         public var userInfo: [CodingUserInfoKey: Sendable]
 
         /// Creates a new `Configuration`.
@@ -61,10 +62,12 @@ public struct URLEncodedFormEncoder: Sendable {
         public init(
             arrayEncoding: ArrayEncoding = .bracket,
             dateEncodingStrategy: DateEncodingStrategy = .secondsSince1970,
-            userInfo: [CodingUserInfoKey: Sendable] = [:]
+            stableKeyOrder: Bool = false,
+            userInfo: [CodingUserInfoKey: Sendable] = [:],
         ) {
             self.arrayEncoding = arrayEncoding
             self.dateEncodingStrategy = dateEncodingStrategy
+            self.stableKeyOrder = stableKeyOrder
             self.userInfo = userInfo
         }
     }
@@ -95,7 +98,8 @@ public struct URLEncodedFormEncoder: Sendable {
         userInfo: [CodingUserInfoKey: Sendable] = [:]
     ) throws -> String {
         try encode(encodable, userInfo: userInfo) {
-            try URLEncodedFormSerializer().serialize($0)
+            try URLEncodedFormSerializer(stableKeyOrder: configuration.stableKeyOrder)
+                .serialize($0)
         }
     }
 
@@ -105,7 +109,8 @@ public struct URLEncodedFormEncoder: Sendable {
         userInfo: [CodingUserInfoKey: Sendable] = [:]
     ) throws {
         try encode(encodable, userInfo: userInfo) {
-            try URLEncodedFormSerializer().serialize($0, into: &queryItems)
+            try URLEncodedFormSerializer(stableKeyOrder: configuration.stableKeyOrder)
+                .serialize($0, into: &queryItems)
         }
     }
 
@@ -503,6 +508,7 @@ private struct URLEncodedFormData: ExpressibleByArrayLiteral, ExpressibleByStrin
 }
 
 private struct URLEncodedFormSerializer: Sendable {
+    var stableKeyOrder: Bool
     func serialize(
         _ data: URLEncodedFormData,
         codingPath: [CodingKey] = [],
@@ -516,7 +522,11 @@ private struct URLEncodedFormSerializer: Sendable {
                 entries.append(key + "=" + value)
             }
         }
-        for (key, child) in data.children {
+        var children = Array(data.children)
+        if stableKeyOrder {
+            children.sort { $0.key < $1.key }
+        }
+        for (key, child) in children {
             try entries.append(
                 serialize(
                     child,
@@ -540,7 +550,11 @@ private struct URLEncodedFormSerializer: Sendable {
                 queryItems.append(URLQueryItem(name: key, value: value))
             }
         }
-        for (key, child) in data.children {
+        var children = Array(data.children)
+        if stableKeyOrder {
+            children.sort { $0.key < $1.key }
+        }
+        for (key, child) in children {
             try serialize(
                 child,
                 into: &queryItems,
