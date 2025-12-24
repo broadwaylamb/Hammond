@@ -516,6 +516,7 @@ private struct URLEncodedFormSerializer: Sendable {
         var entries: [String] = []
         let key = try codingPath.toURLEncodedKey()
         for value in data.values {
+            let value = try value.urlEncoded(codingPath: codingPath)
             if codingPath.count == 0 {
                 entries.append(value)
             } else {
@@ -544,6 +545,7 @@ private struct URLEncodedFormSerializer: Sendable {
     ) throws {
         let key = try codingPath.toURLEncodedKey()
         for value in data.values {
+            let value = try value.urlEncoded(codingPath: codingPath)
             if codingPath.count == 0 {
                 queryItems.append(URLQueryItem(name: value, value: nil))
             } else {
