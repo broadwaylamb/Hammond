@@ -139,10 +139,16 @@ private class _Encoder: Encoder, _Container {
     var codingPath: [CodingKey]
     var userInfo: [CodingUserInfoKey: Any] { self.configuration.userInfo }
 
-    private var container: _Container? = nil
+    private var containers: [_Container] = []
     private let configuration: URLEncodedFormEncoder.Configuration
 
-    func getData() throws -> URLEncodedFormData { try self.container?.getData() ?? [] }
+    func getData() throws -> URLEncodedFormData {
+        var data: URLEncodedFormData = []
+        for container in self.containers {
+            try data.merge(container.getData())
+        }
+        return data
+    }
 
     init(codingPath: [CodingKey], configuration: URLEncodedFormEncoder.Configuration) {
         self.codingPath = codingPath
@@ -156,7 +162,7 @@ private class _Encoder: Encoder, _Container {
             codingPath: codingPath,
             configuration: configuration,
         )
-        self.container = container
+        self.containers.append(container)
         return .init(container)
     }
 
@@ -165,7 +171,7 @@ private class _Encoder: Encoder, _Container {
             codingPath: codingPath,
             configuration: configuration,
         )
-        self.container = container
+        self.containers.append(container)
         return container
     }
 
@@ -174,7 +180,7 @@ private class _Encoder: Encoder, _Container {
             codingPath: codingPath,
             configuration: configuration,
         )
-        self.container = container
+        self.containers.append(container)
         return container
     }
 
@@ -504,6 +510,15 @@ private struct URLEncodedFormData: ExpressibleByArrayLiteral, ExpressibleByStrin
     init(dictionaryLiteral: (String, URLEncodedFormData)...) {
         self.values = []
         self.children = Dictionary(uniqueKeysWithValues: dictionaryLiteral)
+    }
+
+    mutating func merge(_ other: URLEncodedFormData) {
+        values += other.values
+        children.merge(other.children) { v1, v2 in
+            var result = v1
+            result.merge(v2)
+            return result
+        }
     }
 }
 
